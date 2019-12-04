@@ -273,8 +273,30 @@ ALTER TABLE gn_commons.t_modules ALTER COLUMN module_path TYPE CHARACTER VARYING
 ALTER TABLE gn_commons.t_modules ALTER COLUMN module_external_url TYPE CHARACTER VARYING(255);
 ALTER TABLE gn_commons.t_modules ALTER COLUMN module_target TYPE CHARACTER VARYING(10);
 
--- TEST vue export taxons de la synthèse
 
+-- Ajout date création modificiation sur les tables de base de monitoring
+-- viens en complément du stockage vertical
+ALTER TABLE gn_monitoring.t_base_sites ADD meta_create_date timestamp without time zone DEFAULT now();
+ALTER TABLE gn_monitoring.t_base_sites ADD meta_update_date timestamp without time zone DEFAULT now();
+
+
+CREATE TRIGGER tri_meta_dates_change_synthese
+  BEFORE INSERT OR UPDATE
+  ON gn_monitoring.t_base_sites
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.fct_trg_meta_dates_change();
+
+ALTER TABLE gn_monitoring.t_base_visits ADD meta_create_date timestamp without time zone DEFAULT now();
+ALTER TABLE gn_monitoring.t_base_visits ADD meta_update_date timestamp without time zone DEFAULT now();
+
+CREATE TRIGGER tri_meta_dates_change_synthese
+  BEFORE INSERT OR UPDATE
+  ON gn_monitoring.t_base_visits
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.fct_trg_meta_dates_change();
+
+-- Vue export des taxons de la synthèse
+-- Première version qui reste à affiner/étoffer
 CREATE OR REPLACE VIEW gn_synthese.v_synthese_taxon_for_export_view AS
  SELECT t.group1_inpn,
     t.group2_inpn,

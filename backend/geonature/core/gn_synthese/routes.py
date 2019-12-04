@@ -6,10 +6,12 @@ import time
 
 from collections import OrderedDict
 
-from flask import Blueprint, request, current_app, send_from_directory, render_template
+from flask import (
+    Blueprint, request, current_app,
+    send_from_directory, render_template
+)
 from sqlalchemy import distinct, func, desc, select
 from sqlalchemy.orm import exc
-from sqlalchemy.sql import text
 from geojson import FeatureCollection, Feature
 
 
@@ -18,7 +20,6 @@ from geonature.utils.env import DB, ROOT_DIR
 from geonature.utils.errors import GeonatureApiError
 
 from geonature.utils.utilssqlalchemy import serializeQuery
-from geonature.utils.utilsgeometry import FionaShapeService
 
 from geonature.core.gn_synthese.models import (
     Synthese,
@@ -49,8 +50,7 @@ from geonature.utils.utilssqlalchemy import (
     to_csv_resp,
     to_json_resp,
     json_resp,
-    GenericTable,
-    csv_resp,
+    GenericTable
 )
 
 # debug
@@ -292,37 +292,39 @@ def export_taxon_web(info_role):
     This view is customisable by the administrator
     Some columns are mandatory: cd_ref
 
-    POST parameters: Use a list of cd_ref (in POST parameters) to filter the v_synthese_taxon_for_export_view
+    POST parameters: Use a list of cd_ref (in POST parameters)
+         to filter the v_synthese_taxon_for_export_view
 
     :query str export_format: str<'csv'>
 
     """
     # Test de conformité de la vue v_synthese_for_export_view
-    if not getattr(VSyntheseForWebApp,"cd_ref", None):
+    if not getattr(VSyntheseForWebApp, "cd_ref", None):
         return {"msg": "View v_synthese_for_export_view must have a cd_ref column"}, 500
 
-    filters = {key: request.args.getlist(key) for key, value in request.args.items()}
+    filters = {
+        key: request.args.getlist(key) for key, value in request.args.items()
+    }
 
     taxon_view = GenericTable(
         "v_synthese_taxon_for_export_view",
         "gn_synthese",
         None
     )
-    from sqlalchemy import func
 
     q = DB.session.query(
-        distinct(VSyntheseForWebApp.cd_ref),
         taxon_view.tableDef,
-        func.count().over(
+        func.count(
+            VSyntheseForWebApp.id_synthese
+        ).over(
             partition_by=VSyntheseForWebApp.cd_ref
         ).label("nb_obs")
-    ).join(
+    ).distinct().join(
         taxon_view.tableDef,
         getattr(
             taxon_view.tableDef.columns,
             "cd_ref"
-        )
-        == VSyntheseForWebApp.cd_ref,
+        ) == VSyntheseForWebApp.cd_ref
     )
 
     q = synthese_query.filter_query_all_filters(
