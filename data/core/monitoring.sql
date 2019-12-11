@@ -25,6 +25,9 @@ CREATE TABLE t_base_sites
   base_site_code character varying(25) DEFAULT NULL::character varying,
   first_use_date date,
   geom public.geometry(Geometry,4326) NOT NULL,
+  geom_local geometry(Geometry,2154),
+  altitude_min integer,
+  altitude_max integer,
   uuid_base_site UUID DEFAULT public.uuid_generate_v4(),
   meta_create_date timestamp without time zone DEFAULT now(),
   meta_update_date timestamp without time zone DEFAULT now()
@@ -34,6 +37,7 @@ CREATE TABLE t_base_visits
 (
   id_base_visit serial NOT NULL,
   id_base_site integer,
+  id_dataset integer NOT NULL,
   id_digitiser integer,
   visit_date_min date NOT NULL,
   visit_date_max date,
@@ -42,6 +46,7 @@ CREATE TABLE t_base_visits
   meta_create_date timestamp without time zone DEFAULT now(),
   meta_update_date timestamp without time zone DEFAULT now()
 );
+
 
 CREATE TABLE cor_visit_observer
 (
@@ -98,6 +103,10 @@ ALTER TABLE ONLY t_base_visits
 ALTER TABLE ONLY t_base_visits
     ADD CONSTRAINT fk_t_base_visits_id_digitiser FOREIGN KEY (id_digitiser) REFERENCES utilisateurs.t_roles(id_role) ON UPDATE CASCADE;
 
+
+ALTER TABLE gn_monitoring.t_base_visits ADD CONSTRAINT fk_t_base_visits_t_datasets FOREIGN KEY (id_dataset)
+      REFERENCES gn_meta.t_datasets (id_dataset) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE NO ACTION;
 
 ALTER TABLE ONLY cor_visit_observer
   ADD CONSTRAINT fk_cor_visit_observer_id_base_visit FOREIGN KEY (id_base_visit) REFERENCES t_base_visits (id_base_visit) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -165,13 +174,13 @@ CREATE TRIGGER tri_log_changes
   FOR EACH ROW
   EXECUTE PROCEDURE gn_commons.fct_trg_log_changes();
 
-CREATE TRIGGER tri_meta_dates_change_synthese
+CREATE TRIGGER tri_meta_dates_change_t_base_sites
   BEFORE INSERT OR UPDATE
   ON gn_monitoring.t_base_sites
   FOR EACH ROW
   EXECUTE PROCEDURE public.fct_trg_meta_dates_change();
 
-CREATE TRIGGER tri_meta_dates_change_synthese
+CREATE TRIGGER tri_meta_dates_change_t_base_visits
   BEFORE INSERT OR UPDATE
   ON gn_monitoring.t_base_visits
   FOR EACH ROW
@@ -192,8 +201,19 @@ END;
 $BODY$
 LANGUAGE plpgsql;
 
-
 CREATE TRIGGER trg_cor_site_area
   AFTER INSERT OR UPDATE OF geom ON gn_monitoring.t_base_sites
   FOR EACH ROW
   EXECUTE PROCEDURE gn_monitoring.fct_trg_cor_site_area();
+
+CREATE TRIGGER tri_calculate_geom_local
+  BEFORE INSERT OR UPDATE
+  ON gn_monitoring.t_base_sites
+  FOR EACH ROW
+  EXECUTE PROCEDURE ref_geo.fct_trg_calculate_geom_local('geom', 'geom_local');
+
+CREATE TRIGGER tri_t_base_sites_calculate_alt
+  BEFORE INSERT OR UPDATE
+  ON gn_monitoring.t_base_sites
+  FOR EACH ROW
+  EXECUTE PROCEDURE ref_geo.fct_trg_calculate_alt_minmax('geom');
