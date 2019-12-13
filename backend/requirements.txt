@@ -10,7 +10,7 @@
 # `Pipfile.lock` and then regenerate `requirements*.txt`.
 ################################################################################
 
-https://github.com/PnX-SI/Utils-Flask-SQLAlchemy/archive/develop.zip
+https://github.com/PnX-SI/Utils-Flask-SQLAlchemy/archive/niveau_recursivite.zip
 https://github.com/PnX-SI/Utils-Flask-SQLAlchemy-Geo/archive/develop.zip
 https://github.com/PnX-SI/UsersHub-authentification-module/archive/nom_complet.zip
 https://github.com/PnX-SI/Nomenclature-api-module/archive/develop.zip
