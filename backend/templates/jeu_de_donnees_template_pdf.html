@@ -64,22 +64,28 @@
             <div class="information">
                 <p class="info-titre">Identification</p>
                 <p class="info-contenu">
+                    Indentifiant SINP :
+                    <br>
                     {% if data.unique_dataset_id: %}
                         {{ data.unique_dataset_id }}
                     {% endif %}
                     <br>
+                    Instance :
                     {% if data.dataset_name: %}
                         {{ data.dataset_name }}
                     {% endif %}
                     <br>
+                    Nom court :
                     {% if data.dataset_shortname: %}
                         {{ data.dataset_shortname }}
                     {% endif %}
                     <br>
+                    Description :
                     {% if data.dataset_desc: %}
                         {{ data.dataset_desc }}
                     {% endif %}
                     <br>
+                    Type de données :
                     {% if data.data_type.label_default: %}
                         {{ data.data_type.label_default }}
                     {% endif %}
@@ -134,7 +140,7 @@
                 </p>
             </div>
 
-            {% if not (data.cor_dataset_actor and data.cor_dataset_actor[3]) : %}
+            {% if not (data.cor_dataset_actor and data.cor_dataset_actor[5]) : %}
                 <div class="information">
                     <p class="info-titre">Contacts</p>
                     <p class="info-contenu">
@@ -142,13 +148,12 @@
                             {% for actor in data.cor_dataset_actor -%}
                                 {% if actor.nomenclature_actor_role: %}
                                     {{ actor.nomenclature_actor_role.mnemonique }} :
-                                    <br>
                                 {% endif %}
                                 {% if actor.role: %}
                                     {{ actor.role.nom_role }} {{ actor.role.prenom_role }}
                                     <br>
                                 {% endif %}
-                                {% if actor.organism: %}
+                                {% if actor.organism and actor.organism.nom_organisme: %}
                                     {{ actor.organism.nom_organisme }}
                                     <br>
                                 {% endif %}
@@ -174,8 +179,6 @@
                 <div class="information">
                     <p class="info-titre">Attributs additionnels</p>
                 </div>
-            {% else: %}
-                Suite au verso
             {% endif %}
             
         </div>
@@ -217,7 +220,7 @@
         <span>{{data.footer['date']}}</span>
     </div>
 
-    {% if data.cor_dataset_actor and data.cor_dataset_actor[3] : %}
+    {% if data.cor_dataset_actor and data.cor_dataset_actor[5] : %}
         <br/>
         <div class="description" style="transform: translateY(40px);">
             <div class="left-block">
@@ -228,13 +231,12 @@
                             {% for actor in data.cor_dataset_actor -%}
                                 {% if actor.nomenclature_actor_role: %}
                                     {{ actor.nomenclature_actor_role.mnemonique }} :
-                                    <br>
                                 {% endif %}
                                 {% if actor.role: %}
                                     {{ actor.role.nom_role }} {{ actor.role.prenom_role }}
                                     <br>
                                 {% endif %}
-                                {% if actor.organism: %}
+                                {% if actor.organism and actor.organism.nom_organisme: %}
                                     {{ actor.organism.nom_organisme }}
                                     <br>
                                 {% endif %}
