@@ -840,23 +840,30 @@ def get_repartition_taxons(id_dataset):
     data = DB.engine.execute(q, id_dataset=id_dataset)
     return [[d[0], d[1]] for d in data] # for some reason as_dict() doesn't work here
 
-@routes.route("/taxa_distribution", methods=["GET"])
+@routes.route("/taxa_per_acquisition_framework/<int:id_af>/<string:taxa_rank>", methods=["GET"])
 @json_resp
-def get_taxa_distribution(dataset_ids=None):
-    """Get observations found in a given dataset
+def get_taxa_per_acquisition_framework(id_af, taxa_rank):
+    """Get observations found in a given acquisition framework
     """
     params = request.args
     dataset_ids = [int(id) for id in params.getlist("dataset_ids")]
 
-    q = text(
-        """ SELECT count(DISTINCT synt.cd_nom), min(taxr.regne)
-            FROM gn_synthese.synthese synt
-            LEFT OUTER JOIN taxonomie.taxref taxr ON taxr.cd_nom=synt.cd_nom
-            WHERE id_dataset=any(:dataset_ids)
-            GROUP BY taxr.regne """
-    )
-    data = DB.engine.execute(q, dataset_ids=dataset_ids)
-    return [[d[0], d[1]] for d in data] # for some reason as_dict() doesn't work here
+    rank = getattr(Taxref.__table__.columns, taxa_rank)
+
+    data = DB.session.query(
+        func.count(distinct(Synthese.cd_nom)),
+        rank
+    ).select_from(
+        Synthese
+    ).outerjoin(
+        Taxref, Taxref.cd_nom == Synthese.cd_nom
+    ).outerjoin(
+        TDatasets, TDatasets.id_dataset == Synthese.id_dataset
+    ).filter(
+        TDatasets.id_acquisition_framework == id_af
+    ).group_by(rank).all()
+    
+    return [{"count" : d[0], "group": d[1]} for d in data]
 
 # @routes.route("/test", methods=["GET"])
 # @json_resp
