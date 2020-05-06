@@ -109,7 +109,7 @@ export class AfCardComponent implements OnInit {
               this.spinner = false;
           });
         }else if(this.af.datasets.length == 1){
-          this._dfs.getRepartitionTaxons(data.datasets[0].id_dataset).subscribe(data2 => {
+          this._dfs.getTaxaDistribution(data.datasets[0].id_dataset).subscribe(data2 => {
             this.pieChartData.length = 0;
             this.pieChartLabels.length = 0;
               for(let row of data2) {
