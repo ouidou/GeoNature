@@ -346,8 +346,13 @@ export class DataFormService {
     return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/geojson_data/${id}`);
   }
 
-  getDatasetTaxaDistribution(id_dataset) {
-    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/synthese/dataset_taxa_distribution/${id_dataset}`);
+  getTaxaDistribution(id_dataset, id_rang) {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/synthese/taxa_distribution`, {
+      params: {
+        id_dataset: id_dataset,
+        taxa_rank: id_rang
+      }
+    });
   }
 
   getTaxaDistribution(datasets)
