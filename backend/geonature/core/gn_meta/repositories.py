@@ -162,6 +162,6 @@ def get_af_cruved(info_role, params={}):
         q = test_type_and_generate_query(key, value, TAcquisitionFramework, q)
     print(q)
     data = q.all()
-    if as_model:
-        return data
+    #if as_model:
+    #    return data
     return [d.as_dict(True) for d in data]
