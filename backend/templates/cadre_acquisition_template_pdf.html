@@ -176,18 +176,21 @@
             <div class="information">
                 <p class="info-titre">Acteurs</p>
                 <p class="info-contenu">
-                        {% for act in data.cor_af_actor -%} 
-                            {% if act.nomenclature_actor_role: %}
-                                {{ act.nomenclature_actor_role['mnemonique'] }} : {{ act.organism['nom_organisme'] }}
-                            {% endif %}
-                            {% if act.organism and act.role: %}
-                                -
-                            {% endif %}
-                            {% if act.role: %}
-                                {{ act.role['nom_complet'] }}
-                            {% endif %} 
-                            <br>
-                        {%- endfor %}
+                    {% for act in data.cor_af_actor -%} 
+                        {% if act.nomenclature_actor_role: %}
+                            {{ act.nomenclature_actor_role['mnemonique'] }} :
+                        {% endif %}
+                        {% if act.organism: %}
+                            {{ act.organism['nom_organisme'] }}
+                        {% endif %}
+                        {% if act.organism and act.role: %}
+                            -
+                        {% endif %}
+                        {% if act.role: %}
+                            {{ act.role['nom_complet'] }}
+                        {% endif %} 
+                        <br>
+                    {%- endfor %}
                 </p>
             </div>
             {% endif %}

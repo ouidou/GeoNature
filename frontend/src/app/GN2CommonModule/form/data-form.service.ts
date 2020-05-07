@@ -355,15 +355,13 @@ export class DataFormService {
     });
   }
 
-  getTaxaDistribution(datasets)
-  {
-    let params: HttpParams = new HttpParams();
-    let dataset_ids = [];
-    for (let dataset of datasets) {
-      dataset_ids.push(dataset.id_dataset);
-      params = params.append('dataset_ids[]', dataset.id_dataset);
-    }
-    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/synthese/taxa_distribution`, { params: {'dataset_ids': dataset_ids} });
+  getTaxaDistributionAf(id_af, id_rang) {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/synthese/taxa_distribution`, {
+      params: {
+        id_af: id_af,
+        taxa_rank: id_rang
+      }
+    });
   }
 
   uploadCanvas(img: any) {

@@ -21,11 +21,7 @@ export class AfCardComponent implements OnInit {
   // Tableau contenant les données du graphe
   public pieChartData = [];
   // Tableau contenant les couleurs et la taille de bordure du graphe
-  public pieChartColors = [
-    {
-      backgroundColor: ["rgb(0,80,240)", "rgb(80,160,240)", "rgb(160,200,240)"],
-    }
-  ];
+  public pieChartColors = [];
   // Dictionnaire contenant les options à implémenter sur le graphe (calcul des pourcentages notamment)
   public pieChartOptions = {
     cutoutPercentage: 80,
@@ -94,33 +90,19 @@ export class AfCardComponent implements OnInit {
       }
       if(this.af.datasets)
       {
-        if(this.af.datasets.length > 1){
-          this._dfs.getTaxaDistribution(data.datasets).subscribe(data2 => {
-            this.pieChartData.length = 0;
-            this.pieChartLabels.length = 0;
-            this.pieChartData = [];
-            this.pieChartLabels = [];
-              for(let row of data2) {
-                this.pieChartData.push(row[0]);
-                this.pieChartLabels.push(row[1]);
-              }
-              // this.chart.chart.update();
-              // this.chart.ngOnChanges({});
-              this.spinner = false;
-          });
-        }else if(this.af.datasets.length == 1){
-          this._dfs.getTaxaDistribution(data.datasets[0].id_dataset).subscribe(data2 => {
-            this.pieChartData.length = 0;
-            this.pieChartLabels.length = 0;
-              for(let row of data2) {
-                this.pieChartData.push(row[0]);
-                this.pieChartLabels.push(row[1]);
-              }
-              // this.chart.chart.update();
-              // this.chart.ngOnChanges({});
-              this.spinner = false;
-          });
-        }
+        this._dfs.getTaxaDistributionAf(this.af.id_acquisition_framework, 'group2_inpn').subscribe(data2 => {
+          this.pieChartData.length = 0;
+          this.pieChartLabels.length = 0;
+          this.pieChartData = [];
+          this.pieChartLabels = [];
+            for(let row of data2) {
+              this.pieChartData.push(row['count']);
+              this.pieChartLabels.push(row['group']);
+            }
+            // this.chart.chart.update();
+            // this.chart.ngOnChanges({});
+            this.spinner = false;
+        });
       }
       console.log(data);
     });
