@@ -23,13 +23,13 @@
                   title="Editer le cadre d'acquisition"
                   [routerLink]="['/metadata/af', af.id_acquisition_framework]" >
                   <i class="fa fa-pencil-square" aria-hidden="true"></i>
-              </button>
+                </a>
                 <button [disabled]="af.cruved.R == false"
                   class="bt-edit btn-ghost btn-no-padding"
                   title="Visualiser le cadre d'acquisition"
                   [routerLink]="['/metadata/af_detail', af.id_acquisition_framework]" >
                   <i class="fa fa-info-circle" aria-hidden="true"></i>
-            </button>
+                </button>
                 {{af.id_acquisition_framework}}: {{ af.acquisition_framework_name | uppercase }}
               </mat-panel-title>
               <mat-panel-description *ngIf="af.acquisition_framework_name != af.acquisition_framework_desc">
