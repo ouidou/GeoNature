@@ -37,6 +37,8 @@ from geonature.core.gn_permissions import decorators as permissions
 from geonature.core.gn_permissions.tools import cruved_scope_for_user_in_module
 from geonature.core.gn_meta import mtd_utils
 from geonature.utils.errors import GeonatureApiError
+from geonature.utils.env import BACKEND_DIR
+
 import geonature.utils.filemanager as fm
 from binascii import a2b_base64
 
@@ -193,7 +195,7 @@ def get_af_from_id(id_af, af_list):
             found_af = af
             break
     return found_af
-
+    
 
 @routes.route("/dataset/<id_dataset>", methods=["GET"])
 @json_resp
@@ -276,8 +278,7 @@ def upload_canvas():
     """
     data = request.data[22:]
     binary_data = a2b_base64(data)
-
-    fd = open('static/images/taxa.png', 'wb')
+    fd = open(str(BACKEND_DIR) + '/static/images/taxa.png', 'wb')
     fd.write(binary_data)
     fd.close()
 
@@ -566,18 +567,17 @@ def get_acquisition_framework_details(id_acquisition_framework):
     :param type: int
     """
     af = DB.session.query(TAcquisitionFrameworkDetails).get(id_acquisition_framework)
+    if not af:
+        return None
     acquisition_framework = af.as_dict(True)
-    
-    q = DB.session.query(TDatasets).distinct()
-    data = q.filter( \
-                TDatasets.id_acquisition_framework \
-                == id_acquisition_framework).all()
-    dataset_ids = [d.id_dataset for d in data]
-    acquisition_framework["datasets"] = [d.as_dict(True) for d in data]
-    geojsonData = DB.session.query(func.ST_AsGeoJSON(func.ST_Extent(Synthese.the_geom_4326))).filter(Synthese.id_dataset.in_(dataset_ids)).first()[0]
+
+    datasets = acquisition_framework['datasets'] if 'datasets' in acquisition_framework else []
+    dataset_ids = [d['id_dataset'] for d in datasets]
+    geojsonData = DB.session.query(
+        func.ST_AsGeoJSON(func.ST_Extent(Synthese.the_geom_4326))
+    ).filter(Synthese.id_dataset.in_(dataset_ids)).first()[0]
     if geojsonData:
-        acquisition_framework["geojsonData"] = json.loads(geojsonData)
-    
+        acquisition_framework["bbox"] = json.loads(geojsonData)
     nb_data = len(dataset_ids)
     nb_taxons = DB.session.query(Synthese.cd_nom).filter(Synthese.id_dataset.in_(dataset_ids)).distinct().count()
     nb_observations = DB.session.query(Synthese.cd_nom).filter(Synthese.id_dataset.in_(dataset_ids)).count()
@@ -603,8 +603,6 @@ def get_acquisition_framework_details(id_acquisition_framework):
     }
 
     if acquisition_framework:
-        acquisition_framework["nomenclature_territorial_level"] = af.nomenclature_territorial_level.as_dict()
-        acquisition_framework["nomenclature_financing_type"] = af.nomenclature_financing_type.as_dict()
         return acquisition_framework
     return None
 

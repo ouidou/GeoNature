@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DataFormService } from '@geonature_common/form/data-form.service';
 import { BaseChartDirective } from 'ng2-charts';
@@ -63,7 +63,6 @@ export class AfCardComponent implements OnInit {
     private _dfs: DataFormService,
     private _route: ActivatedRoute
   ) { }
-
   ngOnInit() {
     this._route.params.subscribe(params => {
       this.id_af = params['id'];
@@ -71,11 +70,6 @@ export class AfCardComponent implements OnInit {
         this.getAf(this.id_af);
       }
     });
-    // this._dfs.getAcquisitionFrameworks({ is_parent: 'true' }).subscribe(data => {
-    //   this.acquisitionFrameworks = data;
-    // });
-
-    // console.log(this.acquisitionFrameworks);
   }
   getAf(id_af: number) {
     this._dfs.getAcquisitionFrameworkDetails(id_af).subscribe(data => {
@@ -88,31 +82,30 @@ export class AfCardComponent implements OnInit {
         var end_date = new Date(this.af.acquisition_framework_end_date);
         this.af.acquisition_framework_end_date = end_date.toLocaleDateString();
       }
-      if(this.af.datasets)
-      {
-        this._dfs.getTaxaDistributionAf(this.af.id_acquisition_framework, 'group2_inpn').subscribe(data2 => {
+      if (this.af.datasets) {
+        this._dfs.getTaxaDistribution('group2_inpn', { 'id_af': this.af.id_acquisition_framework }).subscribe(data2 => {
           this.pieChartData.length = 0;
           this.pieChartLabels.length = 0;
           this.pieChartData = [];
           this.pieChartLabels = [];
-            for(let row of data2) {
-              this.pieChartData.push(row['count']);
-              this.pieChartLabels.push(row['group']);
-            }
-            // this.chart.chart.update();
-            // this.chart.ngOnChanges({});
-            this.spinner = false;
+          for (let row of data2) {
+            this.pieChartData.push(row["count"]);
+            this.pieChartLabels.push(row["group"]);
+          }
+          this.spinner = false;
+          setTimeout(() => {
+            this.chart.chart.update();
+
+          }, 1000)
         });
       }
-      console.log(data);
-    });
+    })
   }
 
   getPdf() {
     const url = `${AppConfig.API_ENDPOINT}/meta/acquisition_frameworks/export_pdf/${this.af.id_acquisition_framework}`;
-    // window.open(url);
-    const dataUrl = this.chart ? this.chart.ctx.canvas.toDataURL('image/png') : '';
-    this._dfs.uploadCACanvas(dataUrl, 'upload_cadre_acquisition_rde_canvas').subscribe(
+    const chart_img = this.chart ? this.chart.ctx.canvas.toDataURL('image/png') : '';
+    this._dfs.uploadCanvas(chart_img).subscribe(
       data => {
         window.open(url);
       }
