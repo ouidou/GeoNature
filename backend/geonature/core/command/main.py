@@ -100,6 +100,8 @@ def launch_redis_worker():
             q = Queue()
             w = Worker(q)
             w.work()
+            
+
 
 
 @main.command()
