@@ -1,7 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PageEvent, MatPaginator, MatPaginatorIntl } from '@angular/material';
-import { CruvedStoreService } from '../services/cruved-store.service';
+import { CruvedStoreService } from '../GN2CommonModule/service/cruved-store.service';
 import { DataFormService } from '@geonature_common/form/data-form.service';
+
+import { DataService } from "../../../../external_modules/import/frontend/app/services/data.service";
+import { CommonService } from "@geonature_common/service/common.service";
 
 export class MetadataPaginator extends MatPaginatorIntl {
   constructor() {
@@ -28,17 +31,20 @@ export class MetadataPaginator extends MatPaginatorIntl {
   styleUrls: ['./metadata.component.scss'],
   providers: [
     {
-      provide: MatPaginatorIntl,
+      provide:MatPaginatorIntl,
       useClass: MetadataPaginator
     }
+
   ]
 })
-export class MetadataComponent implements OnInit {
+export class MetadataComponent /* extends ImportComponent */ implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   datasets = [];
   acquisitionFrameworks = [];
   tempAF = [];
+  public history;
+  public empty: boolean = false;
   expandAccordions = false;
   private researchTerm: string = '';
 
@@ -46,45 +52,52 @@ export class MetadataComponent implements OnInit {
   activePage: number = 0;
   pageSizeOptions: Array<number> = [10, 25, 50, 100];
 
-  constructor(public _cruvedStore: CruvedStoreService, private _dfs: DataFormService) {}
+
+  constructor(public _cruvedStore: CruvedStoreService, private _dfs: DataFormService,public _ds: DataService,private _commonService: CommonService) { 
+  
+  }
 
   ngOnInit() {
-    this.getAcquisitionFrameworks();
+    this.getAcquisitionFrameworksAndDatasets();
+    this.getImportList();
   }
 
   //recuperation cadres d'acquisition
-  getAcquisitionFrameworks() {
-    this._dfs.getAcquisitionFrameworks().subscribe(data => {
-      this.acquisitionFrameworks = data;
+  getAcquisitionFrameworksAndDatasets() {
+    this._dfs.getAfAndDatasetListMetadata().subscribe(data => {
+      this.acquisitionFrameworks = data.data;
       this.tempAF = this.acquisitionFrameworks;
-      this.getDatasets();
+      //this.getDatasets();
+      this.acquisitionFrameworks.forEach(af => {
+        af['datasetsTemp'] = af['datasets'];
+      })
+
     });
   }
 
-  //recuperation des jeux de données
-  getDatasets() {
-    this._dfs.getDatasets().subscribe(results => {
-      //attribut les jdds au ca respectif
-      for (var i = 0; i < results['data'].length; i++) {
-        let af = this.findAcquisitionFrameworkById(results['data'][i].id_acquisition_framework);
-        if (!('datasets' in af)) {
-          af['datasets'] = new Array();
-          af['datasetsTemp'] = new Array();
+  // recuperer la liste des imports 
+
+  getImportList(){
+    this._ds.getImportList().subscribe(
+      res => {
+        this.history = res.history;
+        this.empty = res.empty;
+      },
+      error => {
+        if (error.statusText === "Unknown Error") {
+          // show error message if no connexion
+          this._commonService.regularToaster(
+            "error",
+            "ERROR: IMPOSSIBLE TO CONNECT TO SERVER (check your connexion)"
+          );
+        } else {
+          // show error message if other server error
+          this._commonService.regularToaster("error", error.error.message);
         }
-        af['datasets'].push(results['data'][i]);
-        af['datasetsTemp'].push(results['data'][i]);
       }
-      // cache our list
-      this.datasets = results['data'];
-    });
+    );
   }
-
-  /**
-   *	Retourne le cadre d'acquisition à partir de son ID
-   **/
-  private findAcquisitionFrameworkById(id: number) {
-    return this.acquisitionFrameworks.find(af => af.id_acquisition_framework == id);
-  }
+  
 
   /**
    *	Filtre les éléments CA et JDD selon la valeur de la barre de recherche
@@ -138,5 +151,6 @@ export class MetadataComponent implements OnInit {
   changePaginator(event: PageEvent) {
     this.pageSize = event.pageSize;
     this.activePage = event.pageIndex;
-  }
+  } 
+  
 }

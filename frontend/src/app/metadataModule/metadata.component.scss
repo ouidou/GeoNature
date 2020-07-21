@@ -18,6 +18,11 @@
   font-size: 22px;
   margin-right: 8px;
   display: flex;
+  color: blue;
+}
+
+.bt-edit:disabled {
+  color: grey;
 }
 
 .bt-edit:hover {
@@ -26,4 +31,33 @@
 
 .bold {
   font-weight: bold;
+}
+
+.imgRapport{
+  white-space: nowrap;
+  margin-left: auto;
+  margin-right: auto;
+  width: 6em;
+}
+
+.imgSensible{
+  width: 32px; 
+  height: 32px;
+}
+
+.imgRapport{
+  width: 32px; 
+  height: 32px;
+}
+
+.imgStatus{
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.tabRecap{
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%
 }
