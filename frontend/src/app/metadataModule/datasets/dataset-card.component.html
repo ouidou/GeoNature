@@ -119,6 +119,45 @@
 
         </div>
       </div>
+      <div class="card">
+        <div class="card-header">
+          <h5>
+            Fiche récapitulative
+          </h5>
+        </div>
+        <div class="card-body">
+          <table *ngIf="!empty" class="table table-bordered tabRecap">
+            <thead class="bold">
+              <tr>
+                  <td class="textCenter">Source</td>
+                  <td class="textCenter">Nombre de données</td>
+                  <td class="textCenter">Importé le</td>
+                  <td class="textCenter">Statut</td>
+                  <td class="textCenter">Rapport</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor='let ListImport of history'>
+                 <td class="textCenter" *ngIf="ListImport.id_dataset === dataset.id_dataset">{{ListImport.import_table}}</td>
+                 <td class="textCenter" *ngIf="ListImport.id_dataset === dataset.id_dataset"> [ {{ListImport.source_count}} ]</td>
+                 <td class="textCenter" *ngIf="ListImport.id_dataset === dataset.id_dataset">{{ListImport.date_create_import | date: 'd/mm/yyyy h:mm:ss a'}}</td>
+                 <td class="textCenter" *ngIf="ListImport.id_dataset === dataset.id_dataset">
+                    <div class="imgStatus">
+                    <img class='imgImportSuccess'*ngIf="ListImport.is_finished" src="../../assets/images/tick.png"/>
+                    <img class='importImportFail' *ngIf="!ListImport.is_finished" src="../../assets/images/close.png"/>
+                   </div>
+                 </td>
+                 <td *ngIf="ListImport.id_dataset === dataset.id_dataset">
+                  <div class='imgRapport'>
+                      <img class='imgSensibles' src="../../assets/images/Rapport_Sensibles.svg"/>
+                      <img class='imgUUID' src="../../assets/images/Rapport_UUID.svg"/>
+                    </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <div class="col-xs-12 col-sm-12 col-md-8 col-lg-4">

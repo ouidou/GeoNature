@@ -13,6 +13,8 @@ import { ActorComponent } from './actors/actors.component';
 import { MetadataComponent } from './metadata.component';
 import { ChartsModule } from "ng2-charts/ng2-charts";
 import { ChartModule } from 'angular2-chartjs';
+import { DataService } from "../../../../external_modules/import/frontend/app/services/data.service";
+
 
 const routes: Routes = [
   { path: '', component: MetadataComponent },
@@ -43,10 +45,11 @@ const routes: Routes = [
     DatasetListComponent,
     DatasetFormComponent,
     DatasetCardComponent,
+    DatasetCardComponent,
     AfListComponent,
     AfFormComponent,
     ActorComponent
   ],
-  providers: []
+  providers: [DataService]
 })
 export class MetadataModule {}
