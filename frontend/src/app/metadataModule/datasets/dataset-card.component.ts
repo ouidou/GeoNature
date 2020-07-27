@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterContentInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataFormService } from '@geonature_common/form/data-form.service';
 import { ModuleService } from '@geonature/services/module.service';
@@ -19,10 +19,14 @@ export class DatasetCardComponent implements OnInit {
   public dataset: any;
   public nbTaxons: number;
   public nbObservations: number;
+<<<<<<< HEAD
   public history;
   public empty: boolean = false;
+=======
+  public geojsonData: any = null;
+>>>>>>> feature/GINCO2-47-53
 
-  @ViewChild(BaseChartDirective) chart: BaseChartDirective;
+  @ViewChild(BaseChartDirective) public chart: BaseChartDirective;
 
   // Type de graphe
   public pieChartType = 'doughnut';
@@ -113,42 +117,43 @@ export class DatasetCardComponent implements OnInit {
   
 
   getDataset(id) {
+
     this._dfs.getDatasetDetails(id).subscribe(data => {
       this.dataset = data;
       if (this.dataset.modules) {
         this.dataset.modules = this.dataset.modules.map(e => e.module_code).join(", ");
       }
+      if ('bbox' in data) {
+        this.geojsonData = data['bbox']
+      }
     });
-    this._dfs.getTaxaDistribution(id, 'group2_inpn').subscribe(data => {
-      /*const rStart=0, gStart=80, bStart=240, rEnd=240, gEnd=240, bEnd=240;
-      var iColor = 0;
-      var tempColors = [];
-      this.pieChartColors = [];
-      this.pieChartColors.length = 0;*/
-      this.pieChartData.length = 0;
-      this.pieChartLabels.length = 0;
+    this._dfs.getTaxaDistribution('group2_inpn', { 'id_dataset': id }).subscribe(data => {
+
+      this.pieChartData = []
+      this.pieChartLabels = []
       for (let row of data) {
-        /*tempColors.push("rgb("
-          + (rEnd*iColor + rStart*(data.length-iColor))/data.length + ","
-          + (gEnd*iColor + gStart*(data.length-iColor))/data.length + ","
-          + (bEnd*iColor + bStart*(data.length-iColor))/data.length + ")");
-        ++iColor;*/
         this.pieChartData.push(row["count"]);
         this.pieChartLabels.push(row["group"]);
       }
-      /*this.pieChartColors = [{
-        backgroundColor: tempColors,
-      }];*/
-      this.chart.chart.update();
-      this.chart.ngOnChanges({});
-      this.spinner = false;
+      // in order to have chart instance
+      setTimeout(() => {
+        this.chart.chart.update();
+
+      }, 1000)
     });
 
   }
 
   getPdf() {
+
     const url = `${AppConfig.API_ENDPOINT}/meta/dataset/export_pdf/${this.id_dataset}`;
-    window.open(url);
+    const dataUrl = this.chart ? this.chart.ctx.canvas.toDataURL("image/png") : "";
+    this._dfs.uploadCanvas(dataUrl).subscribe(
+      data => {
+        window.open(url);
+      }
+    );
+
   }
 
 }
