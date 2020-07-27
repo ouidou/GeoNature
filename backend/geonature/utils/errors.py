@@ -19,7 +19,6 @@ class ConfigError(GeoNatureError):
         Configuration error class
         Quand un fichier de configuration n'est pas conforme aux attentes
     '''
-
     def __init__(self, file, value):
         self.value = value
         self.file = file
@@ -28,7 +27,8 @@ class ConfigError(GeoNatureError):
         msg = "Error in the config file '{}'. Fix the following:\n"
         msg = msg.format(self.file)
         for key, errors in self.value.items():
-            msg += "\n\t{}:\n\t\t- {}".format(key, errors)
+            errors = "\n\t\t-".join(errors)
+            msg += "\n\t{}:\n\t\t-{}".format(key, errors)
         return msg
 
 
@@ -42,7 +42,6 @@ class GeonatureApiError(Exception):
             raised_error,
             message
         )
-
     def to_dict(self):
         return {
             'message': self.message,
@@ -57,7 +56,6 @@ class GeonatureApiError(Exception):
             self.message,
             self.__class__.__name__
         )
-
 
 class AuthentificationError(GeonatureApiError):
     pass

@@ -1,4 +1,7 @@
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
+
+
 
 DROP TABLE IF EXISTS gn_sensitivity.liste_taxons_sensibles;
 CREATE TABLE gn_sensitivity.liste_taxons_sensibles
@@ -19,7 +22,8 @@ CREATE TABLE gn_sensitivity.liste_taxons_sensibles
 );
 
 COPY gn_sensitivity.liste_taxons_sensibles 
-FROM '/tmp/geonature/referentiel_donnees_sensibles.csv' DELIMITER ',' CSV HEADER;
+FROM '/tmp/geonature/181201_referentiel_donnes_sensibles.csv' DELIMITER ',' CSV HEADER;
+
 
 
 -- #################################################

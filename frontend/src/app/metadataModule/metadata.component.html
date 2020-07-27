@@ -8,100 +8,63 @@
       <div class="row">
         <div class="form-group col-sm-7">
           <input class="form-control form-control-sm"
-            type="text" name="" id="" placeholder="Rechercher" (keyup)="updateSearchbar($event)" (click)="openSearchModal(searchModal)">
-        </div>
+            type="text" name="" id="" placeholder="Rechercher" (keyup)="updateSearchbar($event)">
+        </div>  
       </div>
       <div>Liste des cadres d'acquisition et des jeux de données associés</div>
-      <br>
-      
-      <mat-accordion displayMode="flat" multi class="mat-table">
-        <section matSort class="mat-elevation-z2 mat-header-row">
-          <span class="mat-header-cell">
-            ID
-          </span>
-          <span class="mat-header-cell" style="min-width: 480px" >
-            Titre
-          </span>
-          <span class="mat-header-cell">
-            Date de lancement
-          </span>
-          <span class="mat-header-cell">
-            Créateur
-          </span>
-          <span class="mat-header-cell">
-            Maître d'ouvrage
-          </span>
-          <span class="mat-header-cell">
-            Actions
-          </span>
-        </section>
+      <mat-accordion [multi]="true">
         <ng-container *ngFor="let af of tempAF; let idx = index">
           <mat-expansion-panel *ngIf="isDisplayed(idx)" [expanded]="expandAccordions">
-            <mat-expansion-panel-header class="mat-row">
-              <span class="mat-cell" [routerLink]="['/metadata/af_detail', af.id_acquisition_framework]">
-                <a [routerLink]="['/metadata/af_detail', af.id_acquisition_framework]">
-                  {{af.id_acquisition_framework}}
-                </a>
-              </span>
-              <span class="mat-cell" style="min-width: 480px; text-align: left">
-                <a [routerLink]="['/metadata/af_detail', af.id_acquisition_framework]">
-                  {{af.acquisition_framework_name}}
-                </a>
-              </span>
-              <span class="mat-cell">
-                {{af.acquisition_framework_start_date}}
-              </span>
-              <span class="mat-cell">
-                <a href="mailto:{{af.mail_createur}}"> {{af.mail_createur}} </a>
-              </span>
-              <span class="mat-cell">
-                {{af.nom_maitre_ouvrage}}
-              </span>
-              <span class="mat-cell">
-                <img src="./assets/images/Editer.svg" [routerLink]="['/metadata/af', af.id_acquisition_framework]">  
-                <img src="./assets/images/Donnees_map.svg" (click)="syntheseAf(af.id_acquisition_framework)" >
-                <img src="./assets/images/Poubelle.svg" (click)="deleteAf(af.id_acquisition_framework)">
-              </span>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <button [disabled]="af.cruved.U == false"
+                  class="bt-edit btn-ghost btn-no-padding" 
+                  title="Editer le cadre d'acquisition"
+                  [routerLink]="['/metadata/af', af.id_acquisition_framework]" >
+                  <i class="fa fa-pencil-square" aria-hidden="true"></i>
+              </button>
+                {{af.id_acquisition_framework}}: {{ af.acquisition_framework_name | uppercase }}
+              </mat-panel-title>
+              <mat-panel-description *ngIf="af.acquisition_framework_name != af.acquisition_framework_desc">
+                {{ af.acquisition_framework_desc }} 
+              </mat-panel-description>
             </mat-expansion-panel-header>
             <table class="table table-bordered">
               <thead class="bold">
                 <tr>
-                  <td class="mat-header-cell"> Id </td>
-                  <td class="mat-header-cell"> Nom du JDD </td>
-                  <td class="mat-header-cell"> Date de création </td>
-                  <td class="mat-header-cell"> Nombre de données </td>
-                  <td class="mat-header-cell"> Créateur </td>
-                  <td class="mat-header-cell"> Rapports </td>
-                  <td class="mat-header-cell"> Actions </td>
+                    <td style="width:10%"> #</td>
+                    <!-- <td style="width:1%"></td> -->
+                    <td style="width:1%">
+                      Id
+                    </td>
+                    <td>Nom du JDD</td>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let ds of af.datasetsTemp; let last = last">
-                    <td> 
-                      <a [routerLink]="['/metadata/dataset_detail', ds.id_dataset]"> {{ds.id_dataset}} </a>
+                    <td >
+                      <div class="btn-group">
+                          <button [disabled]="ds.cruved.U == false"
+                          class="bt-edit btn-ghost btn-no-padding" 
+                          title="Editer le jeu de données"
+                          [routerLink]="['/metadata/dataset', ds.id_dataset]" >
+                          <i class="fa fa-pencil-square" aria-hidden="true"></i>
+                        </button> 
+                        <button 
+                          [disabled]="ds.cruved.R == false"
+                          class="bt-edit btn-ghost btn-no-padding" 
+                          title="Fiche du jeu de données"
+                          [routerLink]="['/metadata/dataset_detail', ds.id_dataset]" >
+                          <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        </button>
+                      </div>
+
                     </td>
-                    <td style="text-align: left"> 
-                      <a [routerLink]="['/metadata/dataset_detail', ds.id_dataset]"> {{ds.dataset_name}} </a>
-                    </td>
-                    <td> {{ds.meta_create_date}} </td>
-                    <td> Nombre de données </td>
-                    <td> Créateur </td>
-                    <td>
-                      <img src="../../assets/images/Rapport_Sensibles.svg"/>
-                      <img src="../../assets/images/Rapport_UUID.svg"/>
-                    </td>
-                    <td>
-                      <img src="../../assets/images/Editer.svg" [routerLink]="['/metadata/dataset', ds.id_dataset]"/>
-                      <img *ngIf="ds.active" src="../../assets/images/Actif.svg" (click)="activateDs(ds.id_dataset, false)"/>
-                      <img *ngIf="!ds.active" src="../../assets/images/Actif_Off.svg" (click)="activateDs(ds.id_dataset, true)"/>
-                      <img src="./assets/images/Import.svg">  
-                      <img src="./assets/images/Donnees_map.svg" (click)="syntheseDs(ds.id_dataset)" >
-                      <img src="./assets/images/Poubelle.svg" (click)="deleteDs(ds.id_dataset)">
-                    </td>
+                    <td> {{ds.id_dataset}}</td>
+                    <td> {{ ds.dataset_name }} </td>
                 </tr>
               </tbody>
             </table>
-
           </mat-expansion-panel>
         </ng-container>
       </mat-accordion>
@@ -114,20 +77,8 @@
 
       <div>
         <a *ngIf="_cruvedStore.cruved?.METADATA?.cruved.C !== '0'" routerLink="/metadata/af" class="btn btn-primary btn-sm margin-top-sm"> Ajouter un cadre d'acquisition </a>
-        &nbsp;<a *ngIf="_cruvedStore.cruved?.METADATA?.cruved.C !== '0'" routerLink="/metadata/dataset" class="btn btn-primary btn-sm margin-top-sm"> Ajouter un jeu de données </a>
+        <a *ngIf="_cruvedStore.cruved?.METADATA?.cruved.C !== '0'" routerLink="/metadata/dataset" class="btn btn-primary btn-sm margin-top-sm"> Ajouter un jeu de données </a>
       </div>
     </div>
   </div>
 </div>
-
-<ng-template #searchModal let-c="close" let-d="dismiss">
-  <div class="modal-header">
-    <h5 class="modal-title" id="exampleModalLabel"> Rechercher dans le catalogue des jeux de données </h5>
-  </div>
-  <div class="modal-body">
-    <div class="form-group col-sm-7">
-      <input class="form-control form-control-sm"
-        type="text" name="" id="" placeholder="Rechercher" (keyup)="updateSearchbar($event)">
-    </div>
-  </div>
-</ng-template>

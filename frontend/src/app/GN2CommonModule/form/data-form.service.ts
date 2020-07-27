@@ -110,10 +110,6 @@ export class DataFormService {
 
 
 
-  getImports(id_dataset) {
-    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/import/by_dataset/${id_dataset}`);
-  }
-
   getObservers(idMenu) {
     return this._http.get<any>(`${AppConfig.API_ENDPOINT}/users/menu/${idMenu}`);
   }
@@ -296,10 +292,6 @@ export class DataFormService {
     return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/acquisition_framework/${id_af}`);
   }
 
-  getAcquisitionFrameworkDetails(id_af) {
-    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/acquisition_framework_details/${id_af}`);
-  }
-
   getOrganisms(orderByName = true) {
     let queryString: HttpParams = new HttpParams();
     if (orderByName) {
@@ -346,29 +338,12 @@ export class DataFormService {
     return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/dataset_details/${id}`);
   }
 
-  // getTaxaDistribution(id_dataset) {
-  //   return this._http.get<any>(`${AppConfig.API_ENDPOINT}/synthese/dataset_taxa_distribution/${id_dataset}`);
-  // }
-  getGeojsonData(id) {
-    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/geojson_data/${id}`);
-  }
-
-  getRepartitionTaxons(id_dataset) {
-    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/synthese/repartition_taxons_dataset/${id_dataset}`);
-  }
-
-  uploadCanvas(img: any) {
-    return this._http.post<any>(`${AppConfig.API_ENDPOINT}/meta/upload_canvas`, img);
-  }
-  getTaxaDistribution(taxa_rank, params?: ParamsDict) {
-    let queryString = new HttpParams();
-    queryString = queryString.set('taxa_rank', taxa_rank);
-    for (let key in params) {
-      queryString = queryString.set(key, params[key])
-    }
-
+  getTaxaDistribution(id_dataset, id_rang) {
     return this._http.get<any>(`${AppConfig.API_ENDPOINT}/synthese/taxa_distribution`, {
-      params: queryString
+      params: {
+        id_dataset: id_dataset,
+        taxa_rank: id_rang
+      }
     });
   }
 
@@ -440,18 +415,4 @@ export class DataFormService {
     link.click();
     document.body.removeChild(link);
   }
-
-  deleteAf(af_id) {
-    this._http.delete<any>(`${AppConfig.API_ENDPOINT}/meta/acquisition_framework/${af_id}`).subscribe();
-  }
-
-  deleteDs(ds_id) {
-    this._http.delete<any>(`${AppConfig.API_ENDPOINT}/meta/dataset/${ds_id}`).subscribe();
-  }
-
-  activateDs(ds_id, active) {
-    this._http.post<any>(`${AppConfig.API_ENDPOINT}/meta/activate_dataset/${ds_id}/${active}`, {}).subscribe();
-  }
-
 }
-

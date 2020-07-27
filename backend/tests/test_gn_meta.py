@@ -139,7 +139,6 @@ class TestGnMeta:
 
         for cor in fetched_dataset["cor_dataset_actor"]:
             cor.pop("organism")
-            cor.pop("nomenclature_actor_role")
         # ajout d'un acteur
         fetched_dataset["cor_dataset_actor"].append(
             {

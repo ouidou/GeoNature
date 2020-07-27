@@ -72,7 +72,7 @@ export class MultiSelectComponent implements OnInit, OnChanges {
 
   public valSave; // pour la selection au clavier
 
-  constructor(private _translate: TranslateService) { }
+  constructor(private _translate: TranslateService) {}
 
   // Component to generate a custom multiselect input with a search bar (which can be disabled)
   // you can pass whatever callback to the onSearch output, to trigger database research or simple search on an array
@@ -147,14 +147,10 @@ export class MultiSelectComponent implements OnInit, OnChanges {
    * @param item : the full item object (not the id)
    */
   addItem(item) {
-    this.parentFormControl.markAsDirty();
     // remove element from the items list to avoid doublon
-    if (this.values) {
-      this.values = this.values.filter(curItem => {
-        return curItem[this.keyLabel] !== item[this.keyLabel];
-      });
-    }
-
+    this.values = this.values.filter(curItem => {
+      return curItem[this.keyLabel] !== item[this.keyLabel];
+    });
     if (item === 'all') {
       this.selectedItems = [];
       this._translate.get('AllItems', { value: 'AllItems' }).subscribe(value => {
@@ -185,7 +181,6 @@ export class MultiSelectComponent implements OnInit, OnChanges {
   }
 
   removeItem($event, item) {
-    this.parentFormControl.markAsDirty();
     // remove element from the items list to avoid doublon
     this.values = this.values.filter(curItem => {
       return curItem[this.keyLabel] !== item[this.keyLabel];

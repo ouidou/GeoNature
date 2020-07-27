@@ -1,7 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { Map, Marker } from 'leaflet';
-import { BehaviorSubject } from 'rxjs';
-import { filter } from 'rxjs/operators';
 import { MapService } from '../map.service';
 import { AppConfig } from '@geonature_config/app.config';
 import * as L from 'leaflet';
@@ -20,18 +18,14 @@ import { GeoJson } from 'togeojson';
 export class MarkerComponent implements OnInit, OnChanges {
   public map: Map;
   public previousCoord: Array<any>;
-  private _coordinates: BehaviorSubject<Array<any>> = new BehaviorSubject(null);
-  get coordinates(): Array<any> { return this._coordinates.getValue(); }
-  @Input('coordinates') set coordinates(value: Array<any>) {
-    this._coordinates.next(value);
-  }
+  @Input() coordinates: Array<any>;
   @Input() zoomToLocationLevel: number;
   /** Niveau de zoom à partir du quel on peut ajouter un marker sur la carte*/
   @Input() zoomLevel: number;
   /** Contrôle si le marker est activé par défaut au lancement du composant */
   @Input() defaultEnable = true;
   @Output() markerChanged = new EventEmitter<GeoJson>();
-  constructor(public mapservice: MapService, private _commonService: CommonService) { }
+  constructor(public mapservice: MapService, private _commonService: CommonService) {}
 
   ngOnInit() {
     this.map = this.mapservice.map;
@@ -47,16 +41,6 @@ export class MarkerComponent implements OnInit, OnChanges {
     this.mapservice.isMarkerEditing$.subscribe(isEditing => {
       this.toggleEditing(isEditing);
     });
-
-    //Observable pour gérer de l'affichage du marker
-    this._coordinates
-      .pipe(
-        filter((coords) => (this.map !== undefined && coords != null))
-      )
-      .subscribe(coords => {
-        this.previousCoord = coords;
-        this.generateMarkerAndEvent(coords[0], coords[1]);
-      });
   }
 
   setMarkerLegend() {
@@ -150,7 +134,9 @@ export class MarkerComponent implements OnInit, OnChanges {
   ngOnChanges(changes) {
     if (changes.coordinates && changes.coordinates.currentValue) {
       const coords = changes.coordinates.currentValue;
-      this.coordinates = coords;
+      this.mapservice.zoomOnMarker(coords, this.zoomToLocationLevel);
+      this.previousCoord = coords;
+      this.generateMarkerAndEvent(coords[0], coords[1]);
     }
   }
 }

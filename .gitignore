@@ -21,7 +21,6 @@ backend/static/medias/*
 backend/static/shapefiles/*
 backend/static/node_modules
 backend/static/configs/*
-backend/gunicorn_start.sh
 
 backend/run.py
 
@@ -141,7 +140,6 @@ ENV/
 .mypy_cache/
 
 *.pid
-package-lock.json
 *.orig
 
 
@@ -149,5 +147,3 @@ install_all/install_all.log
 
 # Pycharm
 .idea/
-
-backend/static/images/taxa.png

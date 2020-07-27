@@ -1,7 +1,9 @@
 
 -- vue validation de gn_commons necessitant le schéma synthese
-CREATE OR REPLACE VIEW gn_commons.v_synthese_validation_forwebapp AS
-SELECT  s.id_synthese,
+CREATE OR REPLACE VIEW gn_commons.v_synthese_validation_forwebapp AS 
+ 
+CREATE OR REPLACE VIEW gn_commons.v_synthese_validation_forwebapp
+AS SELECT  s.id_synthese,
     s.unique_id_sinp,
     s.unique_id_sinp_grp,
     s.id_source,
@@ -60,8 +62,7 @@ SELECT  s.id_synthese,
     n.cd_nomenclature AS cd_nomenclature_validation_status,
     n.label_default,
     v.validation_auto,
-    v.validation_date,
-    ST_asgeojson(s.the_geom_4326) as geojson
+    v.validation_date
    FROM gn_synthese.synthese s
     JOIN taxonomie.taxref t ON t.cd_nom = s.cd_nom
     JOIN gn_meta.t_datasets d ON d.id_dataset = s.id_dataset

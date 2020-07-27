@@ -8,6 +8,7 @@ import { SideNavService } from './sidenav-service';
   selector: 'pnx-sidenav-items',
   templateUrl: './sidenav-items.component.html',
   styleUrls: ['./sidenav-items.component.scss'],
+  providers: [ModuleService]
 })
 export class SidenavItemsComponent implements OnInit {
   public nav = [{}];
@@ -20,13 +21,10 @@ export class SidenavItemsComponent implements OnInit {
     public globalSub: GlobalSubService,
     public moduleService: ModuleService,
     public _sidenavService: SideNavService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.home_page = { module_url: '/', module_label: 'Accueil', module_picto: 'fa-home', id: '1' };
-    if (!this.moduleService.modules) {
-      this.moduleService.fetchModules();
-    }
   }
 
   setHome() {

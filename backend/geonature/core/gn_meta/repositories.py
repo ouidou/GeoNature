@@ -1,10 +1,7 @@
 import logging
-import json
 
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
-from sqlalchemy.sql.functions import func
-
 from flask import request
 
 from geonature.utils.env import DB
@@ -115,17 +112,10 @@ def get_dataset_details_dict(id_dataset):
         .filter(Synthese.id_dataset == id_dataset)
         .count()
     )
-    geojsonData = (
-        DB.session.query(func.ST_AsGeoJSON(func.ST_Extent(Synthese.the_geom_4326)))
-        .filter(Synthese.id_dataset == id_dataset)
-        .first()[0]
-    )
-    if geojsonData:
-        dataset["bbox"] = json.loads(geojsonData)
     return dataset
 
 
-def get_af_cruved(info_role, params=None, as_model=False):
+def get_af_cruved(info_role, params={}):
     """
         Return the datasets filtered with cruved
         Params:
@@ -157,20 +147,20 @@ def get_af_cruved(info_role, params=None, as_model=False):
             == TAcquisitionFramework.id_acquisition_framework,
         ).filter(CorAcquisitionFrameworkActor.id_role == info_role.id_role)
 
-    if params:
-        params = params.to_dict()
-        if "orderby" in params:
-            try:
-                order_col = getattr(
-                    TAcquisitionFramework.__table__.columns, params.pop("orderby")
-                )
-                q = q.order_by(order_col)
-            except AttributeError:
-                log.error("the attribute to order on does not exist")
+    params = params.to_dict()
+    if "orderby" in params:
+        try:
+            order_col = getattr(
+                TAcquisitionFramework.__table__.columns, params.pop("orderby")
+            )
+            q = q.order_by(order_col)
+        except AttributeError:
+            log.error("the attribute to order on does not exist")
 
-        # Generic Filters
-        for key, value in params.items():
-            q = test_type_and_generate_query(key, value, TAcquisitionFramework, q)
+    # Generic Filters
+    for key, value in params.items():
+        q = test_type_and_generate_query(key, value, TAcquisitionFramework, q)
+    print(q)
     data = q.all()
     if as_model:
         return data
