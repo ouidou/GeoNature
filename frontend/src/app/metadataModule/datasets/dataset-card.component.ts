@@ -91,7 +91,7 @@ export class DatasetCardComponent implements OnInit {
   }
 
    ImportList() {
-    this._ds.getImportDatasets().subscribe(
+    this._ds.getImportList().subscribe(
       res => {
         this.history = res.history;
         this.empty = res.empty;
