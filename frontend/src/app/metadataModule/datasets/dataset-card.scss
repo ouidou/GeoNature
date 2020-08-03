@@ -57,23 +57,19 @@ div.c {
 	border-bottom: 1px solid #edf2f9
 }
 
-.imgRapport{
-	white-space: nowrap;
-	margin-left: auto;
-	margin-right: auto;
-	width: 6em;
+#imgRapport{
+	text-align:center;
   }
   
-  .imgSensible{
-	width: 32px; 
-	height: 32px;
+  .imgIcone{
+	display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+	height: 40px; 
+	padding: 2%;
   }
   
-  .imgRapport{
-	width: 32px; 
-	height: 32px;
-  }
-  
+
   .imgStatus{
 	margin-left: auto;
 	margin-right: auto;
