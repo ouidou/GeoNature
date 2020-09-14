@@ -131,7 +131,7 @@
               <tr>
                   <td class="textCenter">Source</td>
                   <td class="textCenter">Nombre de données</td>
-                  <td class="textCenter">Importé le</td>
+                  <td class="textCenter">Intégré le</td>
                   <td class="textCenter">Statut</td>
                   <td class="textCenter">Rapport</td>
               </tr>
@@ -140,7 +140,7 @@
               <tr *ngFor='let ListImport of history'>
                  <td class="textCenter" *ngIf="ListImport.id_dataset === dataset.id_dataset">{{ListImport.import_table}}</td>
                  <td class="textCenter" *ngIf="ListImport.id_dataset === dataset.id_dataset"> [ {{ListImport.source_count}} ]</td>
-                 <td class="textCenter" *ngIf="ListImport.id_dataset === dataset.id_dataset">{{ListImport.date_create_import | date: 'd/mm/yyyy h:mm:ss a'}}</td>
+                 <td class="textCenter" *ngIf="ListImport.id_dataset === dataset.id_dataset">{{ListImport.date_create_import | date: 'd/mm/yyyy'}}</td>
                  <td class="textCenter" *ngIf="ListImport.id_dataset === dataset.id_dataset">
                     <div class="imgStatus">
                     <img class='imgImportSuccess'*ngIf="ListImport.is_finished" src="../../assets/images/tick.png"/>
@@ -155,6 +155,18 @@
                 </td>
               </tr>
             </tbody>
+
+            <tbody>
+              <tr *ngFor='let taxons of taxs'>
+                 <td class="textCenter" *ngIf="taxons.properties.id_dataset=== dataset.id_dataset" >{{taxons.properties.t_occurrences_occtax[0].taxref.nom_complet}}</td>
+                 <td class="textCenter" *ngIf="taxons.properties.id_dataset=== dataset.id_dataset" >{{taxons.properties.t_occurrences_occtax[0].cor_counting_occtax[0].count_max}}</td>
+                 <td class="textCenter" *ngIf="taxons.properties.id_dataset=== dataset.id_dataset" >{{taxons.properties.date_max |date: 'd/MM/yyyy'}}</td>
+                 <td class="textCenter" *ngIf="taxons.properties.id_dataset=== dataset.id_dataset" ></td>
+                 <td class="textCenter" *ngIf="taxons.properties.id_dataset=== dataset.id_dataset" ><mat-icon matTooltip="Rapport de sensibilité"> do_not_touch</mat-icon>  <mat-icon matTooltip="Rapport d'UUID"> format_list_numbered </mat-icon></td>
+              
+              </tr>
+            </tbody>
+
           </table>
         </div>
       </div>

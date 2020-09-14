@@ -20,6 +20,7 @@ export class DatasetCardComponent implements OnInit {
   public nbTaxons: number;
   public nbObservations: number;
   public history;
+  public taxs;
   public empty: boolean = false;
 
   @ViewChild(BaseChartDirective) chart: BaseChartDirective;
@@ -87,7 +88,16 @@ export class DatasetCardComponent implements OnInit {
     });
 
       this.ImportList();
+      this.TaxonsList();
     
+  }
+
+  TaxonsList(){
+    this._ds.getTaxons().subscribe(
+      taxons =>{
+        this.taxs = taxons.items.features;
+      }
+    )
   }
 
    ImportList() {
