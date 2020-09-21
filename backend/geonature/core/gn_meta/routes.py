@@ -1179,17 +1179,16 @@ def post_jdd_from_user_id(id_user=None, id_organism=None):
 @routes.route('/caSearch',methods=["GET"])
 @json_resp
 def ca_search(id=None,name=None,date=None,organisme=None,role=None):
+
+    id = request.args.get("id")
+    name = request.args.get("name")
+    date = request.args.get("date")
+    organisme = request.args.get("organisme")
+    role = request.args.get("role")
     
-    requete=DB.session.query(TAcquisitionFramework.id_acquisition_framework,\
-            TAcquisitionFramework.unique_acquisition_framework_id,\
-            TAcquisitionFramework.acquisition_framework_name,\
-            TAcquisitionFramework.acquisition_framework_start_date, \
-            CorAcquisitionFrameworkActor.id_role, \
-            BibOrganismes.nom_organisme \
-            ) \
+    requete=DB.session.query(TAcquisitionFramework) \
             .join(CorAcquisitionFrameworkActor, TAcquisitionFramework.id_acquisition_framework == CorAcquisitionFrameworkActor.id_acquisition_framework)\
             .join(BibOrganismes, CorAcquisitionFrameworkActor.id_organism == BibOrganismes.id_organisme)
-    
             
     if id is not None:
         req = requete.filter(TAcquisitionFramework.id_acquisition_framework==id)
@@ -1251,6 +1250,90 @@ def ca_search(id=None,name=None,date=None,organisme=None,role=None):
 
     data = req.all()
               
-    return data
+    return { 'data' : [d.as_dict(True) for d in data]}
 
 
+@routes.route('/jdSearch',methods=["GET"])
+@json_resp
+def jdd_search(id=None,name=None,date=None,organisme=None,role=None):
+
+    id = request.args.get("id")
+    name = request.args.get("name")
+    date = request.args.get("date")
+    organisme = request.args.get("organisme")
+    role = request.args.get("role")
+    
+    requete=DB.session.query(TDatasets) \
+            .join(CorDatasetActor, TDatasets.id_dataset == CorDatasetActor.id_dataset)\
+            .join(BibOrganismes, CorDatasetActor.id_organism == BibOrganismes.id_organisme)
+
+    if id is not None:
+        req = requete.filter(TDatasets.id_dataset==id)
+    if name is not None:
+        req = requete.filter(TDatasets.dataset_name.like('%'+name+'%'))
+    if date is not None:
+        req = requete.filter(TDatasets.meta_create_date.like('%'+date+'%'))
+    if organisme is not None:
+        req = requete.filter(BibOrganismes.nom_organisme.like('%'+organisme+'%'))
+    if role is not None:
+        req = requete.filter(CorDatasetActor.id_dataset.like('%'+role+'%'))
+    
+    if id is not None and name is not None:
+        req = requete.filter(TDatasets.id_dataset==id,\
+                             TDatasets.dataset_name.like('%'+name+'%'))
+                             
+    if id is not None and organisme is not None:
+        req = requete.filter(TDatasets.id_dataset==id,\
+                             BibOrganismes.nom_organisme.like('%'+organisme+'%')
+                            )
+
+    if id is not None and role is not None:
+        req = requete.filter(TDatasets.id_dataset == id,\
+                             CorDatasetActor.id_dataset.like('%'+role+'%')
+                            )
+
+    if name is not None and organisme is not None:
+        req = requete.filter(TDatasets.dataset_name.like('%'+name+'%'),\
+                             BibOrganismes.nom_organisme.like('%'+organisme+'%')
+                            )
+
+    if name is not None and role is not None:
+        req = requete.filter(TDatasets.dataset_name.like('%'+name+'%'),\
+                             CorDatasetActor.id_dataset.like('%'+role+'%')
+                            )
+
+    if organisme is not None and role is not None:
+        req = requete.filter(BibOrganismes.nom_organisme.like('%'+organisme+'%'),\
+                             CorDatasetActor.id_dataset.like('%'+role+'%')
+                            )
+
+    if id is not None and name is not None and organisme is not None:
+        req = requete.filter(TDatasets.id_dataset == id,\
+                            TDatasets.dataset_name.like('%'+name+'%'),\
+                            BibOrganismes.nom_organisme.like('%'+organisme+'%')
+                            )
+
+    if id is not None and name is not None and role is not None:
+        req = requete.filter(TDatasets.id_dataset == id,\
+                             TDatasets.dataset_name.like('%'+name+'%'),\
+                             CorDatasetActor.id_dataset.like('%'+role+'%')
+                            )
+
+    if name is not None and organisme is not None and role is not None:
+        req = requete.filter(TDatasets.dataset_name.like('%'+name+'%'),\
+                             BibOrganismes.nom_organisme.like('%'+organisme+'%'),\
+                             CorDatasetActor.id_dataset.like('%'+role+'%')
+                            )
+
+    if id is not None and name is not None and organisme is not None and role is not None:  
+        req = requete.filter(TDatasets.id_dataset == id,\
+                             TDatasets.dataset_name.like('%'+name+'%'),\
+                             BibOrganismes.nom_organisme.like('%'+organisme+'%'),\
+                             CorDatasetActor.id_dataset.like('%'+role+'%')
+                            )  
+                            
+    if id is None and name is None and organisme is None and role is None:
+        req = requete
+    
+    data = req.all()
+    return { 'data' : [d.as_dict(True) for d in data]}
